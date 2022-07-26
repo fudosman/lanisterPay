@@ -6,9 +6,10 @@ module.exports = class ComputeOps {
     this.shared = [];
     this.sharedBreakdown = [];
     this.totalRatio = 0;
+    this.failedToCompute = [];
   }
   async checkParticipants() {
-    if (this.sharingParticipantsNo < 0) {
+    if (this.sharingParticipantsNo <= 0) {
       return {
         status: "error",
         message: "minimun number of participants not met"
@@ -21,28 +22,54 @@ module.exports = class ComputeOps {
       };
     }
   }
+
   async FlatOps() {
     const treatAsFlat = this.splitInfo.filter((FLAT) => {
       return FLAT.SplitType == "FLAT";
     });
-    console.log(this.balance);
+    // console.log(this.balance);
     treatAsFlat.map((FlatOps) => {
-      this.balance = this.balance - FlatOps.SplitValue;
-      FlatOps.receivedAmount = FlatOps.SplitValue;
-      this.shared.push(FlatOps);
-      console.log(this.balance);
+      if (this.balance > FlatOps.SplitValue) {
+        this.balance = this.balance - FlatOps.SplitValue;
+        FlatOps.receivedAmount = FlatOps.SplitValue;
+        this.shared.push(FlatOps);
+        // console.log(this.balance);
+        return {
+          status: "success",
+          message: "computation successful"
+        };
+      } else {
+        this.failedToCompute.push(FlatOps);
+        return {
+          status: "error",
+          message: "unable to compute, insufficient balance"
+        };
+      }
     });
   }
   async PercentageOps() {
     const treatAsPercentage = this.splitInfo.filter((PERCENTAGE) => {
       return PERCENTAGE.SplitType == "PERCENTAGE";
     });
-    treatAsPercentage.map((Percent) => {
-      this.balance = this.balance - ((Percent.SplitValue / 100) * this.balance);
-      Percent.receivedAmount = (Percent.SplitValue / 100) * this.balance;
-      this.shared.push(Percent);
-      console.log(this.balance);
-    });
+    if (this.balance > 0) {
+      treatAsPercentage.map((Percent) => {
+        this.balance = this.balance - ((Percent.SplitValue / 100) * this.balance);
+        Percent.receivedAmount = (Percent.SplitValue / 100) * this.balance;
+        this.shared.push(Percent);
+        // console.log(this.balance);
+      });
+      return {
+        status: "success",
+        message: "computation successful"
+      };
+    } else {
+      this.failedToCompute.push(Percent);
+      return {
+        status: "error",
+        message: "unable to compute, insufficient balance"
+      };
+    }
+
 
   }
   async RatioOps() {
@@ -52,12 +79,24 @@ module.exports = class ComputeOps {
     treatAsRatio.map((ratioOps) => {
       this.totalRatio = this.totalRatio + ratioOps.SplitValue;
     });
-    treatAsRatio.map((ratioOps) => {
-      this.balance = this.balance - ((ratioOps.SplitValue / this.totalRatio) * this.balance);
-      ratioOps.receivedAmount = (ratioOps.SplitValue / this.totalRatio) * this.balance;
-      this.shared.push(ratioOps);
-      console.log(this.balance);
-    });
+    if (this.balance > 0) {
+      treatAsRatio.map((ratioOps) => {
+        this.balance = this.balance - ((ratioOps.SplitValue / this.totalRatio) * this.balance);
+        ratioOps.receivedAmount = (ratioOps.SplitValue / this.totalRatio) * this.balance;
+        this.shared.push(ratioOps);
+        // console.log(this.balance);
+      });
+      return {
+        status: "success",
+        message: "computation successful"
+      };
+    } else {
+      this.failedToCompute.push(ratioOps);
+      return {
+        status: "error",
+        message: "unable to compute, insufficient balance"
+      };
+    }
   }
 
   async Breakdown() {

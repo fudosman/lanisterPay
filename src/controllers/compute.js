@@ -6,13 +6,11 @@ const compute = async (req, res) => {
     const {Amount, SplitInfo} = payload;
     const computeOps = new ComputeOps(Amount, SplitInfo);
 
-    computeOps.checkParticipants();
-    computeOps.FlatOps();
-    computeOps.PercentageOps();
-    computeOps.RatioOps();
-    computeOps.Breakdown();
-
-    console.log(computeOps);
+    await computeOps.checkParticipants();
+    await computeOps.FlatOps();
+    await computeOps.PercentageOps();
+    await computeOps.RatioOps();
+    await computeOps.Breakdown();
 
     return res.status(200).json({
       ID: payload.ID,
