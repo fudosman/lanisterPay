@@ -10,7 +10,15 @@ const compute = async (req, res) => {
     computeOps.FlatOps();
     computeOps.PercentageOps();
     computeOps.RatioOps();
-    
+    computeOps.Breakdown();
+
+    console.log(computeOps);
+
+    return res.status(200).json({
+      ID: payload.ID,
+      Balance: computeOps.balance,
+      SplitBreakdown: computeOps.sharedBreakdown
+    });
     
    } catch (error) {
      console.error(error);

@@ -4,6 +4,7 @@ module.exports = class ComputeOps {
     this.splitInfo = splitInfo;
     this.sharingParticipantsNo = splitInfo.length;
     this.shared = [];
+    this.sharedBreakdown = [];
     this.totalRatio = 0;
   }
   async checkParticipants() {
@@ -27,6 +28,7 @@ module.exports = class ComputeOps {
     console.log(this.balance);
     treatAsFlat.map((FlatOps) => {
       this.balance = this.balance - FlatOps.SplitValue;
+      FlatOps.receivedAmount = FlatOps.SplitValue;
       this.shared.push(FlatOps);
       console.log(this.balance);
     });
@@ -37,6 +39,7 @@ module.exports = class ComputeOps {
     });
     treatAsPercentage.map((Percent) => {
       this.balance = this.balance - ((Percent.SplitValue / 100) * this.balance);
+      Percent.receivedAmount = (Percent.SplitValue / 100) * this.balance;
       this.shared.push(Percent);
       console.log(this.balance);
     });
@@ -51,8 +54,19 @@ module.exports = class ComputeOps {
     });
     treatAsRatio.map((ratioOps) => {
       this.balance = this.balance - ((ratioOps.SplitValue / this.totalRatio) * this.balance);
+      ratioOps.receivedAmount = (ratioOps.SplitValue / this.totalRatio) * this.balance;
       this.shared.push(ratioOps);
       console.log(this.balance);
+    });
+  }
+
+  async Breakdown() {
+    this.shared.map((entity) => {
+      let singleRecord = {
+        SplitEntityId: entity.SplitEntityId,
+        Amount: entity.receivedAmount
+      };
+      this.sharedBreakdown.push(singleRecord);
     });
   }
 };
