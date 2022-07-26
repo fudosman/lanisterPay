@@ -4,7 +4,7 @@ const globalErrorHandler = require("./errors/app_error_handler");
 require("./middlewares/pre-route.middleware")(app);
 
 
-// API Version 1
+// API
 app.use("/split-payment", require("./routes/index.js"));
 
 // PING
