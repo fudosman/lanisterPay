@@ -1,6 +1,6 @@
 module.exports = class ComputeOps {
   constructor(balance, splitInfo) {
-    this.balance = balance;
+    this.balance = balance.toFixed(2);
     this.splitInfo = splitInfo;
     this.sharingParticipantsNo = splitInfo.length;
     this.shared = [];
@@ -30,8 +30,8 @@ module.exports = class ComputeOps {
     // console.log(this.balance);
     treatAsFlat.map((FlatOps) => {
       if (this.balance > FlatOps.SplitValue) {
-        this.balance = this.balance - FlatOps.SplitValue;
-        FlatOps.receivedAmount = FlatOps.SplitValue;
+        this.balance = (this.balance - FlatOps.SplitValue).toFixed(2);
+        FlatOps.receivedAmount = FlatOps.SplitValue.toFixed(2);
         this.shared.push(FlatOps);
         // console.log(this.balance);
         return {
@@ -53,8 +53,8 @@ module.exports = class ComputeOps {
     });
     if (this.balance > 0) {
       treatAsPercentage.map((Percent) => {
-        this.balance = this.balance - ((Percent.SplitValue / 100) * this.balance);
-        Percent.receivedAmount = (Percent.SplitValue / 100) * this.balance;
+        this.balance = (this.balance - ((Percent.SplitValue / 100) * this.balance)).toFixed(2);
+        Percent.receivedAmount = ((Percent.SplitValue / 100) * this.balance).toFixed(2);
         this.shared.push(Percent);
         // console.log(this.balance);
       });
@@ -81,8 +81,8 @@ module.exports = class ComputeOps {
     });
     if (this.balance > 0) {
       treatAsRatio.map((ratioOps) => {
-        this.balance = this.balance - ((ratioOps.SplitValue / this.totalRatio) * this.balance);
-        ratioOps.receivedAmount = (ratioOps.SplitValue / this.totalRatio) * this.balance;
+        this.balance = (this.balance - ((ratioOps.SplitValue / this.totalRatio) * this.balance)).toFixed(2);
+        ratioOps.receivedAmount = ((ratioOps.SplitValue / this.totalRatio) * this.balance).toFixed(2);
         this.shared.push(ratioOps);
         // console.log(this.balance);
       });
